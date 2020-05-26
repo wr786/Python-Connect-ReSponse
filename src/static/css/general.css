@@ -1,0 +1,19 @@
+body > .ui.container {
+    margin-top: 2em;
+}
+
+.ui.container > h1 {
+    font-size: 3em;
+    text-align: center;
+    font-weight: normal;
+}
+
+.ui.container > h2.dividing.header {
+    font-size: 2em;
+    font-weight: normal;
+    margin: 4em 0em 3em;
+}
+
+.ui.table {
+    table-layout: fixed;
+}
