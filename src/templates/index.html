@@ -1,35 +1,110 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>~ Python Connect Re:Sponse ~</title>
-        <link rel='stylesheet prefetch' href='https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/components/icon.min.css'>
-        <link href="{{ url_for('static',filename='css/semantic.min.css') }}" rel="stylesheet" type="text/css">
-        <script src="{{ url_for('static',filename='js/jquery.min.js') }}"></script>
-        <script src="{{ url_for('static',filename='js/semantic.min.js') }}"></script>
 
-        <link href="{{ url_for('static',filename='css/general.css') }}" rel="stylesheet" type="text/css">
-    </head>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>~ Python Connect Re:Sponse ~</title>
+    <link rel='stylesheet prefetch'
+        href='https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/components/icon.min.css'>
+    <link href="{{ url_for('static',filename='css/semantic.min.css') }}" rel="stylesheet" type="text/css">
+    <script src="{{ url_for('static',filename='js/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static',filename='js/semantic.min.js') }}"></script>
 
-    <body leftmargin="0" topmargin="0" scroll="no">
-        <div id="root" class="ui container">
+    <link href="{{url_for('static',filename='css/highlight.css')}}" rel='stylesheet' type="text/css">
 
-            <h1 class="content">
-                <b id="title" style="color: #F72D81; font-family:Consolas;">~ Python Connect Re:Sponse ~</b>
-            </h1>
+    <link href="{{ url_for('static',filename='css/general.css') }}" rel="stylesheet" type="text/css">
+</head>
 
-            <div class="ui form">
-                <div class="field">
-                    <label>Edit your CODE here:</label>
-                    <textarea></textarea>
-                </div>
-                <div class="ui blue labeled submit icon button">
-                    <i class="icon code"></i>Run Code!
-                </div>
+<body leftmargin="0" topmargin="0" scroll="no">
+    <div id="root" class="ui container">
+
+        <h1 class="content">
+            <b id="title" style="color: #F72D81; font-family:Consolas;">~ Python Connect Re:Sponse ~</b>
+        </h1>
+
+        <div id="result" class="ui hidden message"></div>
+
+        <div class="ui form">
+            <div class="field">
+                <label>Edit your CODE here:</label>
+                <div id="codearea" contenteditable="false" onclick="hide()"></div>
+                <textarea id="edit" rows="25"></textarea>
             </div>
-        
+            <div id="runBtn" class="ui blue labeled submit icon button" onclick="runScript()">
+                <i class="icon code"></i>Run Code!
+            </div>
         </div>
-    </body>
+
+        <div id="loading" class="ui icon message" style="visibility: hidden;">
+            <i class="notched circle loading icon"></i>
+            <div class="content">
+                <div class="header">
+                    Please wait...
+                </div>
+                <p>Compiling & Running</p>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        var onTextareaKeydown = function (e) {
+            if (e.keyCode == 9) {
+                e.preventDefault();
+                var start = this.selectionStart,
+                    end = this.selectionEnd;
+                var text = this.value;
+                var tab = '    ';
+                text = text.substr(0, start) + tab + text.substr(start);
+                this.value = text;
+                this.selectionStart = start + tab.length;
+                this.selectionEnd = end + tab.length;
+            } else if (e.keyCode == 13 && e.shiftKey) {
+                runScript();
+            } else if (e.keyCode == 18) {
+                addHighLight();
+            }
+        }
+        document.getElementById('edit').onkeydown = onTextareaKeydown;
+
+        function hide() { // 隐藏高亮代码
+            $("#codearea").html("");
+            $("#edit").attr("rows", "25")
+        }
+
+        function addHighLight() { // 加高光
+            code = $("#edit").val();
+            var sendData = {
+                code
+            };
+            $.post('/highlight', sendData, function (rtnSvr) {
+                $("#codearea").html(rtnSvr);
+            })
+            $("#edit").attr("rows", "12");
+        }
+
+        function runScript() {
+            $("#loading").css("visibility", "visible");
+            code = $("#edit").val();
+            var sendData = {
+                code
+            };
+            $.post('/runScript', sendData, function (rtnSvr) {
+                $("#result").text(rtnSvr);
+                $("#result").removeClass("hidden");
+            })
+            $("#loading").css("visibility", "hidden");
+        }
+
+        $('.message .close')
+            .on('click', function () {
+                $(this)
+                    .closest('.message')
+                    .transition('fade');
+            });
+    </script>
+
+</body>
 
 </html>

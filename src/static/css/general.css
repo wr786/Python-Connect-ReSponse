@@ -17,3 +17,12 @@ body > .ui.container {
 .ui.table {
     table-layout: fixed;
 }
+
+#codearea {
+    overflow:visible;
+    padding: 2%;
+}
+
+p {
+    margin: 0;
+}
