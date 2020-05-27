@@ -8,7 +8,7 @@ from pygments.lexers.python import PythonLexer
 import time
 
 lexer = get_lexer_by_name("python")
-formatter = HtmlFormatter(style="xcode")
+formatter = HtmlFormatter(style="colorful")
 
 app = Flask(__name__)
 

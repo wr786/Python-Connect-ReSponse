@@ -19,11 +19,12 @@
 <body leftmargin="0" topmargin="0" scroll="no">
     <div id="root" class="ui container">
 
-        <h1 class="content">
+        <h2 class="ui center aligned icon header">
+            <i class="pink edit icon"></i>
             <b id="title" style="color: #F72D81; font-family:Consolas;">~ Python Connect Re:Sponse ~</b>
-        </h1>
+        </h2>
 
-        <div id="result" class="ui hidden message"></div>
+        <div id="result" class="ui hidden positive message"><i class="close icon" onclick="eraseMessage(this)"></i></div>
 
         <div class="ui form">
             <div class="field">
@@ -33,6 +34,12 @@
             </div>
             <div id="runBtn" class="ui blue labeled submit icon button" onclick="runScript()">
                 <i class="icon code"></i>Run Code!
+            </div>
+            <div id="help" class="ui violet labeled icon button" onclick="showHint()">
+                <i class="icon info"></i>Help
+            </div>
+            <div id="clear" class="ui red labeled icon button" onclick="clearCode()">
+                <i class="icon trash"></i>Clear Code
             </div>
         </div>
 
@@ -49,6 +56,7 @@
     </div>
 
     <script>
+
         var onTextareaKeydown = function (e) {
             if (e.keyCode == 9) {
                 e.preventDefault();
@@ -67,6 +75,10 @@
             }
         }
         document.getElementById('edit').onkeydown = onTextareaKeydown;
+
+        function eraseMessage(that) {
+            $(that).closest(".message").transition('fade');
+        }
 
         function hide() { // 隐藏高亮代码
             $("#codearea").html("");
@@ -91,18 +103,16 @@
                 code
             };
             $.post('/runScript', sendData, function (rtnSvr) {
-                $("#result").text(rtnSvr);
+                $("#result").html('<i class="close icon" onclick="eraseMessage(this)"></i>' + '<div class="header">Result:</div><p>' + rtnSvr + '</p>');
                 $("#result").removeClass("hidden");
             })
             $("#loading").css("visibility", "hidden");
         }
 
-        $('.message .close')
-            .on('click', function () {
-                $(this)
-                    .closest('.message')
-                    .transition('fade');
-            });
+        function clearCode() {
+            $("#edit").val("");
+        }
+
     </script>
 
 </body>
