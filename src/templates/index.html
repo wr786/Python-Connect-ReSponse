@@ -28,10 +28,11 @@
 
         <div class="ui form">
             <div class="field">
+                <div id="codearea" contenteditable="false" onclick="hideCodearea()" style="visibility:hidden"></div>
                 <label>Edit your CODE here:</label>
-                <div id="codearea" contenteditable="false" onclick="hide()"></div>
                 <textarea id="edit" rows="25"></textarea>
             </div>
+
             <div id="runBtn" class="ui blue labeled submit icon button" onclick="runScript()">
                 <i class="icon code"></i>Run Code!
             </div>
@@ -40,6 +41,11 @@
             </div>
             <div id="clear" class="ui red labeled icon button" onclick="clearCode()">
                 <i class="icon trash"></i>Clear Code
+            </div>
+
+            <div class="field">
+                <label>Input data:</label>
+                <textarea id="inputData"" rows="5"></textarea>
             </div>
         </div>
 
@@ -80,8 +86,9 @@
             $(that).closest(".message").transition('fade');
         }
 
-        function hide() { // 隐藏高亮代码
+        function hideCodearea() { // 隐藏高亮代码
             $("#codearea").html("");
+            $("#codearea").css("visibility", "hidden");
             $("#edit").attr("rows", "25")
         }
 
@@ -92,6 +99,7 @@
             };
             $.post('/highlight', sendData, function (rtnSvr) {
                 $("#codearea").html(rtnSvr);
+                $("#codearea").css("visibility", "visible");
             })
             $("#edit").attr("rows", "12");
         }
@@ -99,18 +107,37 @@
         function runScript() {
             $("#loading").css("visibility", "visible");
             code = $("#edit").val();
+            inputData = $("#inputData").val();
             var sendData = {
-                code
+                code,
+                inputData
             };
             $.post('/runScript', sendData, function (rtnSvr) {
-                $("#result").html('<i class="close icon" onclick="eraseMessage(this)"></i>' + '<div class="header">Result:</div><p>' + rtnSvr + '</p>');
-                $("#result").removeClass("hidden");
+                var rtnval = rtnSvr[0];
+                var result = rtnSvr.substr(1);
+                result = result.replaceAll("\n", "<br/>")
+                if(rtnval == "0") {
+                    $("#result").html('<i class="close icon" onclick="eraseMessage(this)"></i>' + '<div class="header">Result:</div>' + result + '');
+                    $("#result").removeClass("hidden");
+                    $("#result").removeClass("negative");
+                    $("#result").addClass("positive");
+                } else {
+                    $("#result").html('<i class="close icon" onclick="eraseMessage(this)"></i>' + '<div class="header">Error:</div>' + result + '');
+                    $("#result").removeClass("hidden");
+                    $("#result").removeClass("positive");
+                    $("#result").addClass("negative");
+                }
             })
             $("#loading").css("visibility", "hidden");
         }
 
         function clearCode() {
             $("#edit").val("");
+        }
+
+
+        String.prototype.replaceAll  = function(s1,s2){   
+            return this.replace(new RegExp(s1,"gm"),s2);   
         }
 
     </script>
