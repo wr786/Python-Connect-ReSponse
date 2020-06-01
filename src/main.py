@@ -1,12 +1,14 @@
 # author: wr786
 from flask import Flask, session, render_template, request, redirect
-import os
 from pygments import highlight
 from pygments.formatters.html import HtmlFormatter
 from pygments.lexers import get_lexer_by_name
 from pygments.lexers.python import PythonLexer
+import sys
+import os
 import time
 import subprocess
+import locale
 
 lexer = get_lexer_by_name("python")
 formatter = HtmlFormatter(style="colorful")
@@ -23,20 +25,25 @@ def addHighlight():
 def runScript():
     code = request.form["code"]
     inputData = request.form["inputData"]
-    code = """
+    code = """#!/usr/bin/python
+# -*- coding: UTF-8 -*-
 import sys
-f_handler_2 = open('./data/in.log', 'r')
-sys.stdin = f_handler_2 
+f_handler = open('./data/in.log', 'r')
+sys.stdin = f_handler
 """ + code
-    with open('./data/in.log', "w") as f:
+    with open('./data/in.log', "w", encoding="utf-8") as f:
         f.write(inputData)
-    with open('./data/code.py', "w") as f:
+    with open('./data/code.py', "w", encoding="utf-8") as f:
         f.write(code)
-    process = subprocess.run('python ./data/code.py',shell=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE,encoding="utf-8",timeout=1)
-    if process.returncode == 0:
-        return "0" + process.stdout
-    else:
-        return "1" + process.stderr
+    try:
+        process = subprocess.run('python ./data/code.py',shell=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE,encoding="utf-8")
+        if process.returncode == 0:
+            # "\n".join([line.decode('cp936').encode('utf-8') for line in process.stdout.readlines()])
+            return "0" + process.stdout
+        else:
+            return "1" + process.stderr
+    except Exception as e:
+        return "1" + "Unknown Error:\nMaybe you used some illegal character in your code, you can try replacing them."
 
 @app.route("/")
 def index() :

@@ -1,15 +1,21 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <title>~ Python Connect Re:Sponse ~</title>
     <link rel='stylesheet prefetch'
         href='https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/components/icon.min.css'>
     <link href="{{ url_for('static',filename='css/semantic.min.css') }}" rel="stylesheet" type="text/css">
     <script src="{{ url_for('static',filename='js/jquery.min.js') }}"></script>
     <script src="{{ url_for('static',filename='js/semantic.min.js') }}"></script>
+    <script src="{{ url_for('static',filename='js/ace.js') }}"></script>
+    <script src="{{ url_for('static',filename='js/ext-beautify.js') }}"></script>
+    <script src="{{ url_for('static',filename='js/ext-language_tools.js') }}"></script>
+    <script src="{{ url_for('static',filename='js/mode-python.js') }}"></script>
+    <script src="{{ url_for('static',filename='js/theme-xcode.js') }}"></script>
 
     <link href="{{url_for('static',filename='css/highlight.css')}}" rel='stylesheet' type="text/css">
 
@@ -24,28 +30,33 @@
             <b id="title" style="color: #F72D81; font-family:Consolas;">~ Python Connect Re:Sponse ~</b>
         </h2>
 
-        <div id="result" class="ui hidden positive message"><i class="close icon" onclick="eraseMessage(this)"></i></div>
+        <div id="result" class="ui hidden positive message"><i class="close icon" onclick="eraseMessage(this)"></i>
+        </div>
 
         <div class="ui form">
             <div class="field">
-                <div id="codearea" contenteditable="false" onclick="hideCodearea()" style="visibility:hidden"></div>
+                <!-- <div id="codearea" contenteditable="false" onclick="hideCodearea()" style="visibility:hidden"></div> -->
                 <label>Edit your CODE here:</label>
-                <textarea id="edit" rows="25"></textarea>
+                <div class="ui content">
+                    <div id="editor">print("Hello, My Happy World!")</div>
+                </div>
             </div>
 
-            <div id="runBtn" class="ui blue labeled submit icon button" onclick="runScript()">
-                <i class="icon code"></i>Run Code!
-            </div>
-            <div id="help" class="ui violet labeled icon button" onclick="showHint()">
-                <i class="icon info"></i>Help
-            </div>
-            <div id="clear" class="ui red labeled icon button" onclick="clearCode()">
-                <i class="icon trash"></i>Clear Code
+            <div class="field" id="btnGroup">
+                <div id="runBtn" class="ui blue labeled submit icon button" onclick="runScript()">
+                    <i class="icon code"></i>Run Code!
+                </div>
+                <div id="help" class="ui violet labeled icon button" onclick="showHint()">
+                    <i class="icon info"></i>Help
+                </div>
+                <div id="clear" class="ui red labeled icon button" onclick="clearCode()">
+                    <i class="icon trash"></i>Clear Code
+                </div>
             </div>
 
             <div class="field">
                 <label>Input data:</label>
-                <textarea id="inputData"" rows="5"></textarea>
+                <textarea id="inputData"" rows=" 5"></textarea>
             </div>
         </div>
 
@@ -62,51 +73,56 @@
     </div>
 
     <script>
+        this.editor = ace.edit('editor'); // 这个地方就是id是editor的div
+        this.editor.setTheme('ace/theme/xcode');
+        let pyMode = ace.require('ace/mode/python').Mode;
+        this.editor.session.setMode(new pyMode());
 
-        var onTextareaKeydown = function (e) {
-            if (e.keyCode == 9) {
-                e.preventDefault();
-                var start = this.selectionStart,
-                    end = this.selectionEnd;
-                var text = this.value;
-                var tab = '    ';
-                text = text.substr(0, start) + tab + text.substr(start);
-                this.value = text;
-                this.selectionStart = start + tab.length;
-                this.selectionEnd = end + tab.length;
-            } else if (e.keyCode == 13 && e.shiftKey) {
-                runScript();
-            } else if (e.keyCode == 18) {
-                addHighLight();
-            }
-        }
-        document.getElementById('edit').onkeydown = onTextareaKeydown;
+        // var onTextareaKeydown = function (e) {
+        //     if (e.keyCode == 9) {
+        //         e.preventDefault();
+        //         var start = this.selectionStart,
+        //             end = this.selectionEnd;
+        //         var text = this.value;
+        //         var tab = '    ';
+        //         text = text.substr(0, start) + tab + text.substr(start);
+        //         this.value = text;
+        //         this.selectionStart = start + tab.length;
+        //         this.selectionEnd = end + tab.length;
+        //     } else if (e.keyCode == 13 && e.shiftKey) {
+        //         runScript();
+        //     } else if (e.keyCode == 18) {
+        //         addHighLight();
+        //     }
+        // }
+        // document.getElementById('edit').onkeydown = onTextareaKeydown;
 
         function eraseMessage(that) {
             $(that).closest(".message").transition('fade');
         }
 
-        function hideCodearea() { // 隐藏高亮代码
-            $("#codearea").html("");
-            $("#codearea").css("visibility", "hidden");
-            $("#edit").attr("rows", "25")
-        }
+        // function hideCodearea() { // 隐藏高亮代码
+        //     $("#codearea").html("");
+        //     $("#codearea").css("visibility", "hidden");
+        //     $("#edit").attr("rows", "25")
+        // }
 
-        function addHighLight() { // 加高光
-            code = $("#edit").val();
-            var sendData = {
-                code
-            };
-            $.post('/highlight', sendData, function (rtnSvr) {
-                $("#codearea").html(rtnSvr);
-                $("#codearea").css("visibility", "visible");
-            })
-            $("#edit").attr("rows", "12");
-        }
+        // function addHighLight() { // 加高光
+        //     code = $("#edit").val();
+        //     var sendData = {
+        //         code
+        //     };
+        //     $.post('/highlight', sendData, function (rtnSvr) {
+        //         $("#codearea").html(rtnSvr);
+        //         $("#codearea").css("visibility", "visible");
+        //     })
+        //     $("#edit").attr("rows", "12");
+        // }
 
         function runScript() {
             $("#loading").css("visibility", "visible");
-            code = $("#edit").val();
+            // code = $("#edit").val();
+            code = this.editor.getValue();
             inputData = $("#inputData").val();
             var sendData = {
                 code,
@@ -116,13 +132,15 @@
                 var rtnval = rtnSvr[0];
                 var result = rtnSvr.substr(1);
                 result = result.replaceAll("\n", "<br/>")
-                if(rtnval == "0") {
-                    $("#result").html('<i class="close icon" onclick="eraseMessage(this)"></i>' + '<div class="header">Result:</div>' + result + '');
+                if (rtnval == "0") {
+                    $("#result").html('<i class="close icon" onclick="eraseMessage(this)"></i>' +
+                        '<div class="header">Result:</div>' + result + '');
                     $("#result").removeClass("hidden");
                     $("#result").removeClass("negative");
                     $("#result").addClass("positive");
                 } else {
-                    $("#result").html('<i class="close icon" onclick="eraseMessage(this)"></i>' + '<div class="header">Error:</div>' + result + '');
+                    $("#result").html('<i class="close icon" onclick="eraseMessage(this)"></i>' +
+                        '<div class="header">Error:</div>' + result + '');
                     $("#result").removeClass("hidden");
                     $("#result").removeClass("positive");
                     $("#result").addClass("negative");
@@ -136,10 +154,9 @@
         }
 
 
-        String.prototype.replaceAll  = function(s1,s2){   
-            return this.replace(new RegExp(s1,"gm"),s2);   
+        String.prototype.replaceAll = function (s1, s2) {
+            return this.replace(new RegExp(s1, "gm"), s2);
         }
-
     </script>
 
 </body>
