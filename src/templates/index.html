@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <title>~ Python Connect Re:Sponse ~</title>
-    <link rel='stylesheet prefetch'
-        href='https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/components/icon.min.css'>
+    <!-- <link rel='stylesheet prefetch'
+        href='https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/components/icon.min.css'> -->
     <link href="{{ url_for('static',filename='css/semantic.min.css') }}" rel="stylesheet" type="text/css">
     <script src="{{ url_for('static',filename='js/jquery.min.js') }}"></script>
     <script src="{{ url_for('static',filename='js/semantic.min.js') }}"></script>
@@ -149,10 +149,15 @@
             $("#loading").css("visibility", "hidden");
         }
 
+        function showHint() {
+            alert("Welcome to Python Connect Re:Sponse!\n")
+            alert("You can use some shortcuts(like Ctrl+Z) as you are using an local IDE!\n你可以像使用本地的IDE一样使用一些快捷键（如Ctrl+Z）")
+            alert("and notice that you can ONLY have English in your code, which means that you can't use Chinese characters.\n（注意，请只是用字母，而不要使用中文汉字）")
+        }
+
         function clearCode() {
             this.editor.setValue("");
         }
-
 
         String.prototype.replaceAll = function (s1, s2) {
             return this.replace(new RegExp(s1, "gm"), s2);
