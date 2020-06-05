@@ -16,13 +16,13 @@ formatter = HtmlFormatter(style="colorful")
 app = Flask(__name__)
 
 @app.route("/highlight", methods=["POST", "GET"])
-def addHighlight():
+def addHighlight(): # 给代码加上高亮，运用pygments
     code = request.form["code"]
     html = highlight(code, lexer, formatter)
     return html
 
 @app.route("/runScript", methods=["POST", "GET"])
-def runScript():
+def runScript():    # 运行代码
     code = request.form["code"]
     inputData = request.form["inputData"]
     code = """#!/usr/bin/python
@@ -37,6 +37,8 @@ sys.stdin = f_handler
         f.write(code)
     try:
         process = subprocess.run('python ./data/code.py',shell=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE,encoding="utf-8")
+        os.remove('./data/in.log')
+        os.remove('./data/code.py')
         if process.returncode == 0:
             # "\n".join([line.decode('cp936').encode('utf-8') for line in process.stdout.readlines()])
             return "0" + process.stdout

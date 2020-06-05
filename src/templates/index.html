@@ -119,6 +119,24 @@
         //     $("#edit").attr("rows", "12");
         // }
 
+        function ErrorTranslate(str) {
+            if(str.indexOf('AttributeError') != -1) return "试图访问一个对象没有的属性";
+            if(str.indexOf('IOError') != -1) return "输入/输出异常";
+            if(str.indexOf('ImportError') != -1) return "无法引入模块或包，有一定可能是服务器上没有这个包";
+            if(str.indexOf('IndentationError') != -1) return "代码没有正确对齐，试试检查一下缩进";
+            if(str.indexOf('IndexError') != -1) return "下标越界";
+            if(str.indexOf('KeyError') != -1) return "试图访问字典里不存在的键";
+            if(str.indexOf('KeyboardInterrupt') != -1) return "程序被用Ctrl+C中止运行";
+            if(str.indexOf('NameError') != -1) return "使用一个还未被赋予对象的变量，试试检查一下变量拼写";
+            if(str.indexOf('SyntaxError') != -1) return "代码非法，试试检查一下是否不小心混入了中文字符或标点";
+            if(str.indexOf('TypeError') != -1) return "传入对象类型与要求的不符合，试试检查一下函数调用";
+            if(str.indexOf('ValueError') != -1) return "传入对象的值与要求的不符合，试试检查一下函数调用";
+            if(str.indexOf('UnboundLocalError') != -1) return "试图访问一个还未被设置的局部变量，可能是由于另有一个同名的全局变量，导致你以为正在访问它";
+            if(str.indexOf('Unknown Error') != -1) return "请尽量只使用英文字母！目前并不支持中文、日文及其他语言的文字";
+            if(str.indexOf('EOFError') != -1) return "您可能没有提供足够的输入，试试检查一下输入框";
+            return "";
+        }
+
         function runScript() {
             $("#loading").css("visibility", "visible");
             // code = $("#edit").val();
@@ -132,15 +150,19 @@
                 var rtnval = rtnSvr[0];
                 var result = rtnSvr.substr(1);
                 result = result.replaceAll("\n", "<br/>")
-                if (rtnval == "0") {
+                if (rtnval == "0") {    // 运行正常
                     $("#result").html('<i class="close icon" onclick="eraseMessage(this)"></i>' +
                         '<div class="header">Result:</div>' + result + '');
                     $("#result").removeClass("hidden");
                     $("#result").removeClass("negative");
                     $("#result").addClass("positive");
-                } else {
-                    $("#result").html('<i class="close icon" onclick="eraseMessage(this)"></i>' +
-                        '<div class="header">Error:</div>' + result + '');
+                } else {    // 出现异常
+                    var resultHTML = '<i class="close icon" onclick="eraseMessage(this)"></i>' +
+                        '<div class="header">Error:</div>' + result + '';
+                    // if(result.indexOf('Traceback') != -1) { // find，主要是判断是否是特殊字符造成的错误
+                        resultHTML += ErrorTranslate(result);
+                    // }
+                    $("#result").html(resultHTML);
                     $("#result").removeClass("hidden");
                     $("#result").removeClass("positive");
                     $("#result").addClass("negative");
