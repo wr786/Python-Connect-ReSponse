@@ -36,7 +36,7 @@ sys.stdin = f_handler
     with open('./data/code.py', "w", encoding="utf-8") as f:
         f.write(code)
     try:
-        process = subprocess.run('python ./data/code.py',shell=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE,encoding="utf-8")
+        process = subprocess.run('python ./data/code.py',shell=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE,encoding="utf-8",timeout=1)
         os.remove('./data/in.log')
         os.remove('./data/code.py')
         if process.returncode == 0:
@@ -45,7 +45,7 @@ sys.stdin = f_handler
         else:
             return "1" + process.stderr
     except Exception as e:
-        return "1" + "Unknown Error:\nMaybe you used some illegal character in your code, you can try replacing them."
+        return "1" + "Unknown Error:\nMaybe you used some illegal character in your code, you can try replacing them.\nOr maybe it's just a TLE.\n"
 
 @app.route("/")
 def index() :

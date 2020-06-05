@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <title>~ Python Connect Re:Sponse ~</title>
+    <link rel="icon" href="{{ url_for('static',filename='img/icon.ico') }}" sizes="64x64">
     <!-- <link rel='stylesheet prefetch'
         href='https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/components/icon.min.css'> -->
     <link href="{{ url_for('static',filename='css/semantic.min.css') }}" rel="stylesheet" type="text/css">
@@ -16,6 +17,7 @@
     <script src="{{ url_for('static',filename='js/ext-language_tools.js') }}"></script>
     <script src="{{ url_for('static',filename='js/mode-python.js') }}"></script>
     <script src="{{ url_for('static',filename='js/theme-xcode.js') }}"></script>
+    <script src="{{ url_for('static',filename='js/theme-twilight.js') }}"></script>
 
     <link href="{{url_for('static',filename='css/highlight.css')}}" rel='stylesheet' type="text/css">
 
@@ -52,6 +54,9 @@
                 <div id="clear" class="ui red labeled icon button" onclick="clearCode()">
                     <i class="icon trash"></i>Clear Code
                 </div>
+                <div id="skin" class="ui black labeled icon button" onclick="changeSkin()">
+                    <i id="skinIcon" class="icon moon"></i>Change Skin
+                </div>
             </div>
 
             <div class="field">
@@ -78,6 +83,7 @@
         let pyMode = ace.require('ace/mode/python').Mode;
         this.editor.session.setMode(new pyMode());
 
+        var curIDESkinID = 1;
         // var onTextareaKeydown = function (e) {
         //     if (e.keyCode == 9) {
         //         e.preventDefault();
@@ -132,7 +138,7 @@
             if(str.indexOf('TypeError') != -1) return "传入对象类型与要求的不符合，试试检查一下函数调用";
             if(str.indexOf('ValueError') != -1) return "传入对象的值与要求的不符合，试试检查一下函数调用";
             if(str.indexOf('UnboundLocalError') != -1) return "试图访问一个还未被设置的局部变量，可能是由于另有一个同名的全局变量，导致你以为正在访问它";
-            if(str.indexOf('Unknown Error') != -1) return "请尽量只使用英文字母！目前并不支持中文、日文及其他语言的文字";
+            if(str.indexOf('Unknown Error') != -1) return "请尽量只使用英文字母！目前并不支持中文、日文及其他语言的文字。\n或者是你的程序超时了！";
             if(str.indexOf('EOFError') != -1) return "您可能没有提供足够的输入，试试检查一下输入框";
             return "";
         }
@@ -179,6 +185,19 @@
 
         function clearCode() {
             this.editor.setValue("");
+        }
+
+        function changeSkin() {
+            if(curIDESkinID == 1) {
+                this.editor.setTheme('ace/theme/twilight');
+                $("#skin").removeClass("black").addClass("orange");
+                $("#skinIcon").removeClass("moon").addClass("sun");
+            } else {
+                this.editor.setTheme('ace/theme/xcode');
+                $("#skin").removeClass("orange").addClass("black");
+                $("#skinIcon").removeClass("sun").addClass("moon");
+            }
+            curIDESkinID = 3 - curIDESkinID;
         }
 
         String.prototype.replaceAll = function (s1, s2) {
