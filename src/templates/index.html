@@ -147,7 +147,7 @@
             // $("#loading").html('<div class="ui icon message" style="visibility: hidden;"><i class="notched circle loading icon"></i><div class="content"><div class="header">Please wait...</div><p>Compiling & Running</p></div></div>')
             // code = $("#edit").val();
             var timestamp = (new Date()).valueOf(); // 获取当前的时间戳，用来命名代码文件
-            var code = this.editor.getValue().replaceAll('\n', '');
+            var code = this.editor.getValue();
             var inputData = $("#inputData").val();
             var sendData = {
                 timestamp,
@@ -217,7 +217,7 @@
 
         function uploadCode() {
             var timestamp = (new Date()).valueOf(); // 获取当前的时间戳，用来命名代码文件
-            var code = this.editor.getValue().replaceAll('\n', '');
+            var code = this.editor.getValue().replaceAll('\r\n', '\n');
             var sendData = {
                 timestamp,
                 code,

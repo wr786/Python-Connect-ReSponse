@@ -62,6 +62,7 @@ def runScript():    # 运行代码
 import sys
 f_handler = open('./data/in_{timestamp}.log', 'r')
 sys.stdin = f_handler
+
 """ + code
     with open(f'./data/in_{timestamp}.log', "w", encoding="utf-8") as f:
         f.write(inputData)
