@@ -68,14 +68,11 @@
             </div>
         </div>
 
-        <div id="loading" class="ui icon message" style="visibility: hidden;">
-            <i class="notched circle loading icon"></i>
-            <div class="content">
-                <div class="header">
-                    Please wait...
-                </div>
-                <p>Compiling & Running</p>
-            </div>
+        <!-- <div id="loading"></div> -->
+
+        <div class="ui center aligned vertical footer segment">
+            <p><b>Python-Connect-ReSponse</b> by <a href="https://github.com/wr786" target="_blank" rel="noopener noreferrer">@wr786</a></p>
+            <p>基于MPL-2.0在<a href="https://github.com/wr786/Python-Connect-ReSponse" target="_blank" rel="noopener noreferrer">GitHub</a>开源</p>
         </div>
 
     </div>
@@ -87,24 +84,24 @@
         this.editor.session.setMode(new pyMode());
 
         var curIDESkinID = 1;
-        // var onTextareaKeydown = function (e) {
-        //     if (e.keyCode == 9) {
-        //         e.preventDefault();
-        //         var start = this.selectionStart,
-        //             end = this.selectionEnd;
-        //         var text = this.value;
-        //         var tab = '    ';
-        //         text = text.substr(0, start) + tab + text.substr(start);
-        //         this.value = text;
-        //         this.selectionStart = start + tab.length;
-        //         this.selectionEnd = end + tab.length;
-        //     } else if (e.keyCode == 13 && e.shiftKey) {
-        //         runScript();
-        //     } else if (e.keyCode == 18) {
-        //         addHighLight();
-        //     }
-        // }
-        // document.getElementById('edit').onkeydown = onTextareaKeydown;
+        var onTextareaKeydown = function (e) {
+            if (e.keyCode == 9) {
+                e.preventDefault();
+                var start = this.selectionStart,
+                    end = this.selectionEnd;
+                var text = this.value;
+                var tab = '    ';
+                text = text.substr(0, start) + tab + text.substr(start);
+                this.value = text;
+                this.selectionStart = start + tab.length;
+                this.selectionEnd = end + tab.length;
+            } else if (e.keyCode == 13 && e.shiftKey) {
+                runScript();
+            } else if (e.keyCode == 18) {
+                addHighLight();
+            }
+        }
+        document.getElementById('inputData').onkeydown = onTextareaKeydown; // 实现在输入框能正确输入Tab（缩进
 
         function eraseMessage(that) {
             $(that).closest(".message").transition('fade');
@@ -147,7 +144,7 @@
         }
 
         function runScript() {
-            $("#loading").css("visibility", "visible");
+            // $("#loading").html('<div class="ui icon message" style="visibility: hidden;"><i class="notched circle loading icon"></i><div class="content"><div class="header">Please wait...</div><p>Compiling & Running</p></div></div>')
             // code = $("#edit").val();
             var timestamp = (new Date()).valueOf(); // 获取当前的时间戳，用来命名代码文件
             var code = this.editor.getValue();
@@ -179,7 +176,7 @@
                     $("#result").addClass("negative");
                 }
             })
-            $("#loading").css("visibility", "hidden");
+            // $("#loading").html("")
         }
 
         function showHint() {

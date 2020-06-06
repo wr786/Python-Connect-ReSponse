@@ -39,10 +39,10 @@ def runScript():    # 运行代码
     code = request.form["code"]
     inputData = request.form["inputData"]
     timestamp = request.form["timestamp"]
-    code = """#!/usr/bin/python
+    code = f"""#!/usr/bin/python
 # -*- coding: UTF-8 -*-
 import sys
-f_handler = open('./data/in.log', 'r')
+f_handler = open('./data/in_{timestamp}.log', 'r')
 sys.stdin = f_handler
 """ + code
     with open(f'./data/in_{timestamp}.log', "w", encoding="utf-8") as f:
@@ -50,9 +50,7 @@ sys.stdin = f_handler
     with open(f'./data/code_{timestamp}.py', "w", encoding="utf-8") as f:
         f.write(code)
     try:
-        process = subprocess.run('python ./data/code.py',shell=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE,encoding="utf-8",timeout=1)
-        os.remove(f'./data/in_{timestamp}.log')
-        os.remove(f'./data/code_{timestamp}.py')
+        process = subprocess.run(f'python ./data/code_{timestamp}.py',shell=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE,encoding="utf-8",timeout=1)
         if process.returncode == 0:
             # "\n".join([line.decode('cp936').encode('utf-8') for line in process.stdout.readlines()])
             return "0" + process.stdout
@@ -60,6 +58,9 @@ sys.stdin = f_handler
             return "1" + process.stderr
     except Exception:
         return "1" + "Unknown Error:\nMaybe you used some illegal character in your code, you can try replacing them.\nOr maybe it's just a TLE.\n"
+    finally:
+        os.remove(f'./data/in_{timestamp}.log')
+        os.remove(f'./data/code_{timestamp}.py')
 
 @app.route("/")
 def index() :
