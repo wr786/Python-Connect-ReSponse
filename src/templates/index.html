@@ -138,7 +138,7 @@
             if (str.indexOf('TypeError') != -1) return "传入对象类型与要求的不符合，试试检查一下函数调用";
             if (str.indexOf('ValueError') != -1) return "传入对象的值与要求的不符合，试试检查一下函数调用";
             if (str.indexOf('UnboundLocalError') != -1) return "试图访问一个还未被设置的局部变量，可能是由于另有一个同名的全局变量，导致你以为正在访问它";
-            if (str.indexOf('Unknown Error') != -1) return "请尽量只使用英文字母！目前并不支持中文、日文及其他语言的文字。\n或者是你的程序超时了！";
+            if (str.indexOf('Unknown Error') != -1) return "请尽量只使用英文字母！目前并不支持中文、日文及其他语言的文字。<br/>或者是你的程序超时了！";
             if (str.indexOf('EOFError') != -1) return "您可能没有提供足够的输入，试试检查一下输入框";
             return "";
         }
@@ -147,7 +147,7 @@
             // $("#loading").html('<div class="ui icon message" style="visibility: hidden;"><i class="notched circle loading icon"></i><div class="content"><div class="header">Please wait...</div><p>Compiling & Running</p></div></div>')
             // code = $("#edit").val();
             var timestamp = (new Date()).valueOf(); // 获取当前的时间戳，用来命名代码文件
-            var code = this.editor.getValue();
+            var code = this.editor.getValue().replaceAll('\n', '');
             var inputData = $("#inputData").val();
             var sendData = {
                 timestamp,
@@ -163,8 +163,9 @@
                         '<div class="header">Result:</div>' + result + '');
                     $("#result").removeClass("hidden");
                     $("#result").removeClass("negative");
+                    $("#result").removeClass("warning");
                     $("#result").addClass("positive");
-                } else { // 出现异常
+                } else if (rtnval == "1") { // 出现异常
                     var resultHTML = '<i class="close icon" onclick="eraseMessage(this)"></i>' +
                         '<div class="header">Error:</div>' + result + '';
                     // if(result.indexOf('Traceback') != -1) { // find，主要是判断是否是特殊字符造成的错误
@@ -173,7 +174,16 @@
                     $("#result").html(resultHTML);
                     $("#result").removeClass("hidden");
                     $("#result").removeClass("positive");
+                    $("#result").removeClass("warning");
                     $("#result").addClass("negative");
+                } else if (rtnval == "2") { // 出现禁用库
+                    $("#result").html('<i class="close icon" onclick="eraseMessage(this)"></i>' +
+                        '<div class="header">Warning:</div>Package ' + result + ' is banned by the Server.<br/>系统已禁用' + result + '库！');
+                    $("#result").html(resultHTML);
+                    $("#result").removeClass("hidden");
+                    $("#result").removeClass("positive");
+                    $("#result").removeClass("negative");
+                    $("#result").addClass("warning");
                 }
             })
             // $("#loading").html("")
@@ -207,7 +217,7 @@
 
         function uploadCode() {
             var timestamp = (new Date()).valueOf(); // 获取当前的时间戳，用来命名代码文件
-            var code = this.editor.getValue();
+            var code = this.editor.getValue().replaceAll('\n', '');
             var sendData = {
                 timestamp,
                 code,
@@ -215,10 +225,11 @@
             var filename = "ERROR";
             $.post("/upload", sendData, function (rtnSvr) {
                 $("#result").html('<i class="close icon" onclick="eraseMessage(this)"></i>' +
-                    '<div class="header">Share or Download Link:</div><a href="/download/' + rtnSvr +
-                    '">127.0.0.1/download/' + rtnSvr + '</a>');
+                    '<div class="header">Share Link:</div><a href="/share/' + rtnSvr +
+                    '">127.0.0.1/share/' + rtnSvr + '</a>');
                 $("#result").removeClass("hidden");
                 $("#result").removeClass("negative");
+                $("#result").removeClass("warning");
                 $("#result").addClass("positive");
             });
         }

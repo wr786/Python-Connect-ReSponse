@@ -9,11 +9,21 @@ import os
 import time
 import subprocess
 import locale
+import re
 
 lexer = get_lexer_by_name("python")
 formatter = HtmlFormatter(style="colorful")
 
+blacklist = []
+
 app = Flask(__name__)
+
+def checkBlackList(code):   # 用于禁用一些敏感库
+    for item in blacklist:
+        pattern = re.compile(f'import\s*?{item}')
+        if re.match(pattern, code) != None:
+            return item
+    return 'OK'
 
 @app.route("/upload", methods=["POST", "GET"])
 def uploadCode():   # 上传代码文件，用来交流分享
@@ -28,17 +38,25 @@ def uploadCode():   # 上传代码文件，用来交流分享
 def downloadFile(filename):
     return send_from_directory('./data/', filename, as_attachment=True)
 
-@app.route("/highlight", methods=["POST", "GET"])
-def addHighlight(): # 给代码加上高亮，运用pygments
-    code = request.form["code"]
+def addHighlight(code): # 给代码加上高亮，运用pygments
     html = highlight(code, lexer, formatter)
     return html
+
+@app.route("/share/<filename>", methods=['GET']) # 分享代码
+def shareFile(filename):
+    code = ""
+    with open(f'./data/{filename}', "r", encoding="utf-8") as f:
+        code = f.read()
+    return render_template(f'shareCode.html', code=addHighlight(code), filename=filename)
 
 @app.route("/runScript", methods=["POST", "GET"])
 def runScript():    # 运行代码
     code = request.form["code"]
     inputData = request.form["inputData"]
     timestamp = request.form["timestamp"]
+    cblFlag = checkBlackList(code)
+    if cblFlag != 'OK':
+        return "2" + cblFlag
     code = f"""#!/usr/bin/python
 # -*- coding: UTF-8 -*-
 import sys
@@ -67,5 +85,6 @@ def index() :
     return render_template("index.html")
 
 if __name__ == "__main__":
-    print(os.path.abspath("."))
+    with open('./blacklist.ini', 'r') as f:
+        blacklist = f.read().splitlines()
     app.run(port=80, debug=True)
