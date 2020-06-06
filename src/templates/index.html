@@ -60,6 +60,12 @@
                 <div id="upload" class="ui green labeled icon button" onclick="uploadCode()">
                     <i class="icon upload"></i>Upload Code
                 </div>
+                <div class="circular ui icon button" onclick="decFontSize()">
+                    <i class="icon minus"></i>
+                </div>
+                <div class="circular ui icon button" onclick="incFontSize()">
+                    <i class="icon plus"></i>
+                </div>
             </div>
 
             <div class="field">
@@ -83,6 +89,7 @@
         let pyMode = ace.require('ace/mode/python').Mode;
         this.editor.session.setMode(new pyMode());
 
+        var curFontSize = 16;
         var curIDESkinID = 1;
         var onTextareaKeydown = function (e) {
             if (e.keyCode == 9) {
@@ -134,7 +141,7 @@
             if (str.indexOf('KeyError') != -1) return "试图访问字典里不存在的键";
             if (str.indexOf('KeyboardInterrupt') != -1) return "程序被用Ctrl+C中止运行";
             if (str.indexOf('NameError') != -1) return "使用一个还未被赋予对象的变量，试试检查一下变量拼写";
-            if (str.indexOf('SyntaxError') != -1) return "代码非法，试试检查一下是否不小心混入了中文字符或标点";
+            if (str.indexOf('SyntaxError') != -1) return "代码非法，试试检查一下是否不小心混入了中文字符或标点，或者是不是忘记了加:？";
             if (str.indexOf('TypeError') != -1) return "传入对象类型与要求的不符合，试试检查一下函数调用";
             if (str.indexOf('ValueError') != -1) return "传入对象的值与要求的不符合，试试检查一下函数调用";
             if (str.indexOf('UnboundLocalError') != -1) return "试图访问一个还未被设置的局部变量，可能是由于另有一个同名的全局变量，导致你以为正在访问它";
@@ -196,6 +203,7 @@
             alert(
                 "And notice that you can ONLY have English in your code, which means that you can't use Chinese characters.\n（注意，请只是用字母，而不要使用中文汉字）")
             alert("Use Upload Code to share your code with others! Or just to download your code.\n利用上传代码的功能来将您的代码分享给其他人！或者仅仅是为了下载自己的代码。")
+            alert("Use - & + to change font size!\n利用“-”和“+”来改变字体大小！")
         }
 
         function clearCode() {
@@ -232,6 +240,21 @@
                 $("#result").removeClass("warning");
                 $("#result").addClass("positive");
             });
+        }
+
+        function setFontSize(size) {
+            this.editor.container.style.fontSize = String(size) + "px";
+        }
+        setFontSize(curFontSize);
+
+        function decFontSize() {
+            curFontSize -= 1;
+            setFontSize(curFontSize);
+        }
+
+        function incFontSize() {
+            curFontSize += 1;
+            setFontSize(curFontSize);
         }
 
         String.prototype.replaceAll = function (s1, s2) {
