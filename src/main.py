@@ -86,6 +86,8 @@ def index() :
     return render_template("index.html")
 
 if __name__ == "__main__":
+    if not os.path.exists('./data'):
+        os.mkdir('data') 
     with open('./blacklist.ini', 'r') as f:
         blacklist = f.read().splitlines()
     app.run(port=80, debug=True)
