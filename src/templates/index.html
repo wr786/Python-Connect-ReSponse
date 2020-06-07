@@ -165,6 +165,7 @@
                 var rtnval = rtnSvr[0];
                 var result = rtnSvr.substr(1);
                 result = result.replaceAll("\n", "<br/>")
+                result = result.replaceAll(" ", "&ensp;")
                 if (rtnval == "0") { // 运行正常
                     $("#result").html('<i class="close icon" onclick="eraseMessage(this)"></i>' +
                         '<div class="header">Result:</div>' + result + '');
