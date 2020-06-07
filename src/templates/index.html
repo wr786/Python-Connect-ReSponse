@@ -89,8 +89,10 @@
         let pyMode = ace.require('ace/mode/python').Mode;
         this.editor.session.setMode(new pyMode());
 
-        var curFontSize = 16;
-        var curIDESkinID = 1;
+        var curFontSize = 16;   // 默认字号
+        var curIDESkinID = 1;   // 默认XCode样式
+
+        // 实现在输入框能正确输入Tab（缩进），以及用Shift+Enter运行代码
         var onTextareaKeydown = function (e) {
             if (e.keyCode == 9) {
                 e.preventDefault();
@@ -108,8 +110,9 @@
                 addHighLight();
             }
         }
-        document.getElementById('inputData').onkeydown = onTextareaKeydown; // 实现在输入框能正确输入Tab（缩进
+        document.getElementById('inputData').onkeydown = onTextareaKeydown; 
 
+        // 消除运行信息
         function eraseMessage(that) {
             $(that).closest(".message").transition('fade');
         }
@@ -132,7 +135,8 @@
         //     $("#edit").attr("rows", "12");
         // }
 
-        function ErrorTranslate(str) {  // 给予常见错误的中文提示
+        // 给予常见错误的中文提示
+        function ErrorTranslate(str) {  
             if (str.indexOf('AttributeError') != -1) return "试图访问一个对象没有的属性";
             if (str.indexOf('IOError') != -1) return "输入/输出异常";
             if (str.indexOf('ImportError') != -1) return "无法引入模块或包，有一定可能是服务器上没有这个包";
@@ -150,6 +154,7 @@
             return "";
         }
 
+        // 运行代码
         function runScript() {
             // $("#loading").html('<div class="ui icon message" style="visibility: hidden;"><i class="notched circle loading icon"></i><div class="content"><div class="header">Please wait...</div><p>Compiling & Running</p></div></div>')
             // code = $("#edit").val();
@@ -197,6 +202,7 @@
             // $("#loading").html("")
         }
 
+        // 帮助信息
         function showHint() {
             alert("Welcome to Python Connect Re:Sponse!\n")
             alert(
@@ -207,10 +213,12 @@
             alert("Use - & + to change font size!\n利用“-”和“+”来改变字体大小！")
         }
 
+        // 清空代码
         function clearCode() {
             this.editor.setValue("");
         }
 
+        // 改变IDE皮肤，目前仅支持xcode和twilight（其实还可以再加
         function changeSkin() {
             if (curIDESkinID == 1) {
                 this.editor.setTheme('ace/theme/twilight');
@@ -224,6 +232,7 @@
             curIDESkinID = 3 - curIDESkinID;
         }
 
+        // 上传代码
         function uploadCode() {
             var timestamp = (new Date()).valueOf(); // 获取当前的时间戳，用来命名代码文件
             var code = this.editor.getValue().replaceAll('\r\n', '\n');
@@ -231,7 +240,7 @@
                 timestamp,
                 code,
             };
-            var filename = "ERROR";
+            var filename = "ERROR"; // 初始化为ERROR，便于DEBUG
             $.post("/upload", sendData, function (rtnSvr) {
                 $("#result").html('<i class="close icon" onclick="eraseMessage(this)"></i>' +
                     '<div class="header">Share Link:</div><a href="/share/' + rtnSvr +
@@ -243,21 +252,25 @@
             });
         }
 
+        // 改变字号
         function setFontSize(size) {
             this.editor.container.style.fontSize = String(size) + "px";
         }
-        setFontSize(curFontSize);
+        setFontSize(curFontSize);   // 默认字号
 
+        // 缩小字体
         function decFontSize() {
             curFontSize -= 1;
             setFontSize(curFontSize);
         }
 
+        // 放大字体
         function incFontSize() {
             curFontSize += 1;
             setFontSize(curFontSize);
         }
 
+        // 实现replaceAll函数
         String.prototype.replaceAll = function (s1, s2) {
             return this.replace(new RegExp(s1, "gm"), s2);
         }
